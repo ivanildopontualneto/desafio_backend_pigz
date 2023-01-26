@@ -18,10 +18,10 @@ class Tarefa
     private ?string $descricao_tarefa = null;
 
     #[ORM\Column]
-    private ?int $lista_id = null;
-
-    #[ORM\Column]
     private ?int $status_tarefa = null;
+
+    #[ORM\ManyToOne(inversedBy: 'tarefas')]
+    private ?Lista $lista = null;
 
     public function getId(): ?int
     {
@@ -40,18 +40,6 @@ class Tarefa
         return $this;
     }
 
-    public function getListaId(): ?int
-    {
-        return $this->lista_id;
-    }
-
-    public function setListaId(int $lista_id): self
-    {
-        $this->lista_id = $lista_id;
-
-        return $this;
-    }
-
     public function getStatusTarefa(): ?int
     {
         return $this->status_tarefa;
@@ -60,6 +48,18 @@ class Tarefa
     public function setStatusTarefa(int $status_tarefa): self
     {
         $this->status_tarefa = $status_tarefa;
+
+        return $this;
+    }
+
+    public function getLista(): ?Lista
+    {
+        return $this->lista;
+    }
+
+    public function setLista(?Lista $lista): self
+    {
+        $this->lista = $lista;
 
         return $this;
     }

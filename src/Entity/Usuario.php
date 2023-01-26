@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UsuarioRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -30,6 +32,14 @@ class Usuario implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255)]
     private ?string $nome = null;
+
+    #[ORM\ManyToMany(targetEntity: Lista::class, mappedBy: 'usuario')]
+    private Collection $listas;
+
+    public function __construct()
+    {
+        $this->listas = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -109,6 +119,33 @@ class Usuario implements UserInterface, PasswordAuthenticatedUserInterface
     public function setNome(string $nome): self
     {
         $this->nome = $nome;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Lista>
+     */
+    public function getListas(): Collection
+    {
+        return $this->listas;
+    }
+
+    public function addLista(Lista $lista): self
+    {
+        if (!$this->listas->contains($lista)) {
+            $this->listas->add($lista);
+            $lista->addUsuario($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLista(Lista $lista): self
+    {
+        if ($this->listas->removeElement($lista)) {
+            $lista->removeUsuario($this);
+        }
 
         return $this;
     }

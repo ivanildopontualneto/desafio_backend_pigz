@@ -7,7 +7,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\ListaRepository;
+use App\Repository\TarefaRepository;
 use App\Entity\Lista;
+use App\Entity\Tarefa;
 
 class ListaController extends AbstractController
 {
@@ -22,20 +24,28 @@ class ListaController extends AbstractController
 
     //Criação de Listas
     #[Route('/listas', name: 'listas_create', methods: ['POST'])]
-    public function create(Request $request, ListaRepository $listaRepository): JsonResponse
+    public function create(Request $request, ListaRepository $listaRepository, TarefaRepository $tarefaRepository): JsonResponse
     {
         $data = $request->request->all();
 
         $lista = new Lista();
-        $lista->setDescricaoLista($data['descricao_lista']);
-        $lista->setUsuarioId($data['usuario_id']);
+        $lista->setDescricaoLista($data['descricao']);
+        
+        if(isset($data['tarefas'])){
+            foreach($data['tarefas'] as $tarefa){
+                $taflista = new Tarefa();
+                
+                $this->$tarefaRepository;
 
-        $tarefa = new Tarefa();
-        $tarefa->setDescricaoTarefa($data['descricao_tarefa']);
-        $tarefa->setListaId($data['lista_id']);
-        $tarefa->setStatusTarefa($data['status_tarefa']);
+                $taflista->setDescricaoTarefa($tarefa['descricao']);
+                $taflista->setStatusTarefa($tarefa['status']);
+                $lista->addTarefa($taflista);
+            }
+        }
+        //$tarefa->setDescricaoTarefa(['descricao_tarefa']);
+        //$tarefa->setStatusTarefa('status_tarefa');
+        //$tarefa->setLista('lista_tarefa');
 
-        $lista->setTarefaId($data['tarefa_id']);
         
         $listaRepository->save($lista, true);
 
@@ -70,36 +80,5 @@ class ListaController extends AbstractController
         return $this->json([
             'message' => 'Lista removida com sucesso!'
         ], 200);
-    }
-
-    //Adicionar Tarefa na Lista
-    #[Route('/listas/{lista}', name: 'listas_tarefas', methods: ['POST'])]
-    public function adicionarTarefa(int $lista, ListaRepository $listaRepository): JsonResponse
-    {   
-        $lista = $listaRepository->find($lista);
-
-        if(!$lista) throw $this->createNotFoundException();
-
-        $tarefa = new Tarefa();
-        $tarefa->setDescricaoTarefa($data['descricao']);
-
-        return $this->json([
-            'data' => $lista,
-        ]);
-    }
-
-    //Remover Tarefa na Lista
-    #[Route('/listas/{lista}', name: 'listas_tarefas', methods: ['POST'])]
-    public function removerTarefa(int $lista, ListaRepository $listaRepository): JsonResponse
-    {   
-        $lista = $listaRepository->find($lista);
-
-        if(!$lista) throw $this->createNotFoundException();
-
-        $lista = $tarefaRepository->remove($lista, true);
-
-        return $this->json([
-            'data' => $lista,
-        ]);
     }
 }
